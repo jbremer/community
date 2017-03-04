@@ -45,6 +45,20 @@ class NamedUnittest(Signature):
     authors = ["Cuckoo Technologies"]
     minimum = "2.0.0"
 
+    def api_count(self, apiname):
+        apistats = self.get_results("behavior", {}).get("apistats", {})
+        count = 0
+        for funcs in apistats.values():
+            count += funcs.get(apiname, 0)
+        return count
+
+    def api_calls(self, apiname):
+        processes = self.get_results("behavior", {}).get("processes", [])
+        for process in processes:
+            for call in process["calls"]:
+                if call["api"] == apiname:
+                    yield call
+
     def on_complete(self):
         if self.name in named_unittests(self):
             # Little bit hacky, but aligns with UnittestAnswer.

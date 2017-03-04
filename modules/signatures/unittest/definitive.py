@@ -22,6 +22,9 @@ class UnittestError(Unittest):
         for line in self.get_results("debug", {}).get("log", []):
             if "CRITICAL:" in line:
                 self.mark(line=line)
+        for line in self.get_results("debug", {}).get("cuckoo", []):
+            if "CRITICAL:" in line:
+                self.mark(line=line)
         return self.has_marks()
 
 class UnittestWarning(Unittest):
@@ -30,6 +33,9 @@ class UnittestWarning(Unittest):
 
     def check(self):
         for line in self.get_results("debug", {}).get("log", []):
+            if "WARNING:" in line:
+                self.mark(line=line)
+        for line in self.get_results("debug", {}).get("cuckoo", []):
             if "WARNING:" in line:
                 self.mark(line=line)
         return self.has_marks()
