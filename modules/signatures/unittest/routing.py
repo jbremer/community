@@ -63,6 +63,9 @@ class InternetRoutingUnittest(NamedUnittest):
 class TorRoutingUnittest(NamedUnittest):
     description = "In tor routing mode traffic is routed through Tor"
 
+class VPNRoutingUnittest(NamedUnittest):
+    description = "In VPN routing mode traffic is routed through a VPN"
+
 class NormalRoutingConnectLocal(ConnectLocal, NormalRoutingUnittest):
     name = "unittest.named.routing.normal.connect-local"
     should_connect = True
@@ -77,6 +80,10 @@ class InternetRoutingConnectLocal(ConnectLocal, InternetRoutingUnittest):
 
 class TorRoutingConnectLocal(ConnectLocal, TorRoutingUnittest):
     name = "unittest.named.routing.tor.connect-local"
+    should_connect = False
+
+class VPNRoutingConnectLocal(ConnectLocal, VPNRoutingUnittest):
+    name = "unittest.named.routing.vpn.connect-local"
     should_connect = False
 
 class NormalRoutingResolveDns(ResolveDns, NormalRoutingUnittest):
@@ -95,6 +102,10 @@ class TorRoutingResolveDns(ResolveDns, TorRoutingUnittest):
     name = "unittest.named.routing.tor.resolve-dns"
     should_resolve = True
 
+class VPNRoutingResolveDns(ResolveDns, VPNRoutingUnittest):
+    name = "unittest.named.routing.vpn.resolve-dns"
+    should_resolve = True
+
 class NormalRoutingRemoteDirect(RemoteDirect, NormalRoutingUnittest):
     name = "unittest.named.routing.normal.remote-direct"
     should_connect = False
@@ -109,6 +120,10 @@ class InternetRoutingRemoteDirect(RemoteDirect, InternetRoutingUnittest):
 
 class TorRoutingRemoteDirect(RemoteDirect, TorRoutingUnittest):
     name = "unittest.named.routing.tor.remote-direct"
+    should_connect = True
+
+class VPNRoutingRemoteDirect(RemoteDirect, VPNRoutingUnittest):
+    name = "unittest.named.routing.vpn.remote-direct"
     should_connect = True
 
 class NormalRoutingMyip(Myip, NormalRoutingUnittest):
@@ -147,3 +162,10 @@ class TorRoutingMyip(Myip, TorRoutingUnittest):
 
     def check(self):
         return self.ipaddr() in self.ipaddrs()
+
+class VPNRoutingMyip(Myip, VPNRoutingUnittest):
+    name = "unittest.named.routing.vpn.myip"
+
+    def check(self):
+        ipaddr = requests.get("http://myip.cuckoo.sh/").content.strip()
+        return self.ipaddr() == ipaddr
