@@ -2,6 +2,8 @@
 # This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org
 # See the file 'docs/LICENSE' for copying permission.
 
+import logging
+
 try:
     from cuckoo.common.abstracts import Signature
     from cuckoo.common.config import parse_options
@@ -14,6 +16,8 @@ except ImportError:
 
     def parse_options(*args, **kwargs):
         pass
+
+log = logging.getLogger(__name__)
 
 def named_unittests(sig):
     ret, options = [], parse_options(
@@ -61,10 +65,20 @@ class NamedUnittest(Signature):
 
     def on_complete(self):
         if self.name in named_unittests(self):
-            # Little bit hacky, but aligns with UnittestAnswer.
-            if self.check() is True:
-                self.severity = 5
-            else:
+            try:
+                # Little bit hacky, but aligns with UnittestAnswer.
+                if self.check() is True:
+                    self.severity = 5
+                else:
+                    self.severity = -5
+            except AssertionError as e:
+                log.warning("Assertion failed: %s", e)
+                self.severity = -5
+            except:
+                log.exception(
+                    "An exception occurred in the named unittest: %s",
+                    self.name
+                )
                 self.severity = -5
             return True
 
